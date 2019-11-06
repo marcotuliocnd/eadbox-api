@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/marcotuliocnd/eadbox-api/issues"
   },
-  "homepage": "https://github.com/marcotuliocnd/eadbox-api#readme"
+  "homepage": "https://github.com/marcotuliocnd/eadbox-api#readme",
+  "dependencies": {
+    "axios": "^0.19.0"
+  }
 }
