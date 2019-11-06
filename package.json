@@ -1,0 +1,19 @@
+{
+  "name": "eadbox-api",
+  "version": "1.0.0",
+  "description": "Uma biblioteca que realiza todas as funcoes da API da plataforma EADBOX",
+  "main": "src/eadbox-api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcotuliocnd/eadbox-api.git"
+  },
+  "author": "Marco Túlio Candeo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marcotuliocnd/eadbox-api/issues"
+  },
+  "homepage": "https://github.com/marcotuliocnd/eadbox-api#readme"
+}
