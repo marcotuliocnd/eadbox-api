@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const makeLoginFromEmailAndPassword = async (url, userEmailPassword) => {
+exports.makeLoginFromEmailAndPassword = async (url, userEmailPassword) => {
   try {
     return (await axios.post(url + '/api/login', userEmailPassword)).data;
   } catch (error) {
@@ -10,7 +10,7 @@ const makeLoginFromEmailAndPassword = async (url, userEmailPassword) => {
 
 exports.getUserAuthTokenFromLogin = async (url, userEmailPassword) => {
   try {
-    return (await makeLoginFromEmailAndPassword(url, userEmailPassword)).authentication_token;
+    return (await this.makeLoginFromEmailAndPassword(url, userEmailPassword)).authentication_token;
   } catch (err) {
     return err;
   }
@@ -27,7 +27,7 @@ exports.createNewUser = async (url, userObject) => {
 exports.addCourseForUser = async (url, courseSlug, userAuthToken) => {
   try {
     return (await axios.post(url + '/api/user/subscriptions?auth_token=' + userAuthToken, { course_slug: courseSlug })).data;
-  } catch {
+  } catch (err) {
     return err;
   }
 }
