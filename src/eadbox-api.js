@@ -8,7 +8,7 @@ const makeLoginFromEmailAndPassword = async (url, userEmailPassword) => {
   }
 }
 
-exports.getAuthTokenFromLogin = async (url, userEmailPassword) => {
+exports.getUserAuthTokenFromLogin = async (url, userEmailPassword) => {
   try {
     return (await makeLoginFromEmailAndPassword(url, userEmailPassword)).authentication_token;
   } catch (err) {
@@ -16,19 +16,17 @@ exports.getAuthTokenFromLogin = async (url, userEmailPassword) => {
   }
 }
 
-exports.registerUser = async (url, userObject) => {
+exports.createNewUser = async (url, userObject) => {
   try {
-    return await axios.post(url + '/api/signup', userObject);
+    return (await axios.post(url + '/api/signup', userObject)).data;
   } catch (err) {
     return err;
   }
 }
 
-exports.giveCourseForUser = async (url, courseSlug, userSlug) => {
+exports.addCourseForUser = async (url, courseSlug, userAuthToken) => {
   try {
-    return await axios.post(url + '/api/user/subscriptions?auth_token=' + token, {
-      course_slug: courseSlug
-    });
+    return (await axios.post(url + '/api/user/subscriptions?auth_token=' + userAuthToken, { course_slug: courseSlug })).data;
   } catch {
     return err;
   }
