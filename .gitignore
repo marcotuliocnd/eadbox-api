@@ -1,3 +1,6 @@
+# Models
+tests/models.js
+
 # Logs
 logs
 *.log
