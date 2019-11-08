@@ -16,14 +16,6 @@ exports.getUserAuthTokenFromLogin = async (url, userEmailPassword) => {
   }
 }
 
-exports.getUserIdFromLogin = async (url, userEmailPassword) => {
-  try {
-    return (await this.makeLoginFromEmailAndPassword(url, userEmailPassword)).user.user_id;
-  } catch (err) {
-    return err;
-  }
-}
-
 exports.createNewUser = async (url, userObject) => {
   try {
     return (await axios.post(url + '/api/signup', userObject)).data;
@@ -32,10 +24,27 @@ exports.createNewUser = async (url, userObject) => {
   }
 }
 
-exports.addCourseForUser = async (url, courseSlug, adminAuthToken) => {
+exports.addCourseForUser = async (url, courseSlug, userAuthToken) => {
   try {
-    return (await axios.post(url + '/api/admin/subscriptions/' + '1' + '?auth_token=' + adminAuthToken, { course_slug: courseSlug })).data;
+    return (await axios.post(url + '/api/user/subscriptions?auth_token=' + userAuthToken, { course_slug: courseSlug })).data;
   } catch (err) {
     return err;
+  }
+}
+
+exports.getAllCoursesSlugs = async (url, adminAuthToken) => {
+  let urlWithToken = url + '/api/admin/courses?auth_token=' + adminAuthToken;
+  try {
+    let response = await axios.get(urlWithToken);
+    if (response.status != 200)
+      return null;
+
+    let coursesJson = response.data;
+    var courseSlugsArray = [];
+    for (course in coursesJson)
+      courseSlugsArray[course] = coursesJson[course].course_slug;
+    return courseSlugsArray;
+  } catch (error) {
+    return null;
   }
 }
