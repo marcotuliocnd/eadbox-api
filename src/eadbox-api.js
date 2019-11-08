@@ -16,6 +16,14 @@ exports.getUserAuthTokenFromLogin = async (url, userEmailPassword) => {
   }
 }
 
+exports.getUserIdFromLogin = async (url, userEmailPassword) => {
+  try {
+    return (await this.makeLoginFromEmailAndPassword(url, userEmailPassword)).user.user_id;
+  } catch (err) {
+    return err;
+  }
+}
+
 exports.createNewUser = async (url, userObject) => {
   try {
     return (await axios.post(url + '/api/signup', userObject)).data;
@@ -24,9 +32,9 @@ exports.createNewUser = async (url, userObject) => {
   }
 }
 
-exports.addCourseForUser = async (url, courseSlug, userAuthToken) => {
+exports.addCourseForUser = async (url, courseSlug, adminAuthToken) => {
   try {
-    return (await axios.post(url + '/api/user/subscriptions?auth_token=' + userAuthToken, { course_slug: courseSlug })).data;
+    return (await axios.post(url + '/api/admin/subscriptions/' + '1' + '?auth_token=' + adminAuthToken, { course_slug: courseSlug })).data;
   } catch (err) {
     return err;
   }
