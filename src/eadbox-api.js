@@ -48,3 +48,8 @@ exports.getAllCoursesSlugs = async (url, adminAuthToken) => {
     return null;
   }
 }
+
+exports.getNumberOfCourses = async (url, adminAuthToken) => {
+  var coursesArray = await this.getAllCoursesSlugs(url, adminAuthToken);
+  return coursesArray.length;
+}

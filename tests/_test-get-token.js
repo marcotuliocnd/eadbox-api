@@ -7,6 +7,10 @@ async function start() {
 
   for (course in allCourses)
     console.log(allCourses[course]);
+
+  const numberOfCourses = await eadbox.getNumberOfCourses('https://unispk.com.br', adminAuthToken);
+
+  console.log(numberOfCourses + ' cursos publicados');
 }
 
 start();

@@ -4,7 +4,7 @@
   "description": "Uma biblioteca que realiza todas as funcoes da API da plataforma EADBOX",
   "main": "src/eadbox-api.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node tests/_test-get-token.js"
   },
   "repository": {
     "type": "git",
