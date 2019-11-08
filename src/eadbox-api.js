@@ -31,3 +31,20 @@ exports.addCourseForUser = async (url, courseSlug, userAuthToken) => {
     return err;
   }
 }
+
+exports.getAllCoursesSlugs = async (url, adminAuthToken) => {
+  let urlWithToken = url + '/api/admin/courses?auth_token=' + adminAuthToken;
+  try {
+    let response = await axios.get(urlWithToken);
+    if (response.status != 200)
+      return null;
+
+    let coursesJson = response.data;
+    var courseSlugsArray = [];
+    for (course in coursesJson)
+      courseSlugsArray[course] = coursesJson[course].course_slug;
+    return courseSlugsArray;
+  } catch (error) {
+    return null;
+  }
+}
