@@ -130,3 +130,33 @@ exports.getAllTracks = async (url, adminAuthToken) => {
   }
   return allTracks;
 }
+
+exports.getScoreRanking = async (url) => {
+  try {
+    const rankingScore = await axios.get(url + '/api/rankings/score');
+    return rankingScore.data;
+  } catch (error) {
+    console.error('Não foi possível geral o ranking por score');
+    console.error(error);
+  }
+}
+
+exports.getBadgeRanking = async (url) => {
+  try {
+    const rankingBadge = await axios.get(url + '/api/rankings/badges');
+    return rankingBadge.data;
+  } catch (error) {
+    console.error('Não foi possível geral o ranking por badges');
+    console.error(error);
+  }
+}
+
+exports.getCollectorRanking = async (url) => {
+  try {
+    const rankingCollector = await axios.get(url + '/api/rankings/collectors');
+    return rankingCollector.data;
+  } catch (error) {
+    console.error('Não foi possível geral o ranking por collectors');
+    console.error(error);
+  }
+}
