@@ -78,7 +78,6 @@ exports.getJsonWithAllUsers = async (url, adminAuthToken) => {
       } catch (error) {
         return null;
       }
-
     }
     return response.data;
   } catch (error) {
