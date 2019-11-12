@@ -24,6 +24,18 @@ exports.createNewUser = async (url, userObject) => {
   }
 }
 
+exports.updateUserInformation = async (url, adminAuthToken, userId, userObject) => {
+  urlWithToken = url + '/api/admin/users/' + userId + '?auth_token=' + adminAuthToken;
+  try {
+    const updateResponse = await axios.patch(urlWithToken, userObject);
+    return updateResponse.valid;
+  } catch (error) {
+    console.warn(error);
+    console.error('Não foi possível enviar a requisição de updateUserInformation');
+    return false;
+  }
+}
+
 exports.addCourseForUser = async (url, courseSlug, userAuthToken) => {
   try {
     return (await axios.post(url + '/api/user/subscriptions?auth_token=' + userAuthToken, { course_slug: courseSlug })).data;

@@ -2,16 +2,27 @@ const eadbox = require("../src/eadbox-api")
 const models = require('./models')
 
 async function start() {
+  const url = 'https://unispk.com.br'
   const marco = {};
-  marco.email = 'api@marcotuliocnd.tech';
+  marco.email = 'marco@marcotuliocnd.tech';
   marco.password = '123abc';
   marco.password_confirmation = '123abc';
-  marco.name = 'Api Teste';
-  marco.custom_fields = { empresa: 'Marco', 'tipo-pessoa': 'Colaborador' }
+  marco.name = 'Marco';
+  const userUpdate = {
+    custom_fields: {
+        'empresa': 'Spk Sistemas',
+        'tipo-pessoa': 'Cliente'
+      }
+    }
 
-  const response = await eadbox.createNewUser('https://unispk.com.br', marco);
-
-  console.log(response);
+  // eadbox.createNewUser(url, marco);
+  const userId = await eadbox.makeLoginFromEmailAndPassword(url, { 'email':'marco@marcotuliocnd.tech', 'password':'123abc' } );
+  const adminAuthToken = await eadbox.getUserAuthTokenFromLogin(url, models.adminEmailAndPassword);
+  const updateResponse = await eadbox.updateUserInformation(url, adminAuthToken, userId.user.user_id, userUpdate);
+  if (updateResponse == true)
+    console.log('success');
+  else
+    console.log('error');
 }
 
 start();
