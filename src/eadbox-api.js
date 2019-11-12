@@ -32,6 +32,11 @@ exports.addCourseForUser = async (url, courseSlug, userAuthToken) => {
   }
 }
 
+exports.getNumberOfCourses = async (url, adminAuthToken) => {
+  var coursesArray = await this.getAllCoursesSlugs(url, adminAuthToken);
+  return coursesArray.length;
+}
+
 exports.getAllCoursesSlugs = async (url, adminAuthToken) => {
   let urlWithToken = url + '/api/admin/courses?auth_token=' + adminAuthToken;
   try {
@@ -49,7 +54,34 @@ exports.getAllCoursesSlugs = async (url, adminAuthToken) => {
   }
 }
 
-exports.getNumberOfCourses = async (url, adminAuthToken) => {
-  var coursesArray = await this.getAllCoursesSlugs(url, adminAuthToken);
-  return coursesArray.length;
+exports.getNumberOfUsers = async (url, adminAuthToken) => {
+  let usersJson = await this.getJsonWithAllUsers(url, adminAuthToken);
+  return usersJson.length;
+}
+
+exports.getJsonWithAllUsers = async (url, adminAuthToken) => {
+  let urlWithToken = url + '/api/admin/users?page=1&created_at=2019-02-25T11:23:54.275-03:00&active=true&auth_token=' + adminAuthToken;
+  try {
+    let response = await axios.get(urlWithToken);
+    if (response.status != 200)
+      return null;
+
+    let pageNumber = 1;
+    while (response.data != []) {
+      pageNumber++;
+      urlWithToken = url + '/api/admin/users?page='+ pageNumber + '&active=true&auth_token=' + adminAuthToken;
+      try {
+        response = await axios.get(urlWithToken);
+        if (response.status != 200)
+          return null;
+        allUsers.push(JSON.parse(response.data));
+      } catch (error) {
+        return null;
+      }
+
+    }
+    return response.data;
+  } catch (error) {
+    return null;
+  }
 }

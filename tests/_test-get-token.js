@@ -3,14 +3,14 @@ const models = require('./models')
 
 async function start() {
   const adminAuthToken = await eadbox.getUserAuthTokenFromLogin('https://unispk.com.br', models.adminEmailAndPassword);
-  var allCourses = await eadbox.getAllCoursesSlugs('https://unispk.com.br', adminAuthToken);
+  var allUsers = await eadbox.getJsonWithAllUsers('https://unispk.com.br', adminAuthToken);
 
-  for (course in allCourses)
-    console.log(allCourses[course]);
+  console.log(allUsers);
 
-  const numberOfCourses = await eadbox.getNumberOfCourses('https://unispk.com.br', adminAuthToken);
+  const numberOfCourses = await eadbox.getNumberOfUsers('https://unispk.com.br', adminAuthToken);
 
-  console.log(numberOfCourses + ' cursos publicados');
+  console.log(numberOfCourses + ' alunos cadastrados');
+  console.log(adminAuthToken);
 }
 
 start();
