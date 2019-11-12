@@ -45,54 +45,88 @@ exports.addCourseForUser = async (url, courseSlug, userAuthToken) => {
 }
 
 exports.getNumberOfCourses = async (url, adminAuthToken) => {
-  var coursesArray = await this.getAllCoursesSlugs(url, adminAuthToken);
-  return coursesArray.length;
+  let coursesJson = await this.getAllCourses(url, adminAuthToken);
+  let length = 0;
+  for (let page of coursesJson) {
+    length += page.length;
+  }
+  return length;
 }
 
-exports.getAllCoursesSlugs = async (url, adminAuthToken) => {
-  let urlWithToken = url + '/api/admin/courses?auth_token=' + adminAuthToken;
-  try {
-    let response = await axios.get(urlWithToken);
-    if (response.status != 200)
-      return null;
-
-    let coursesJson = response.data;
-    var courseSlugsArray = [];
-    for (course in coursesJson)
-      courseSlugsArray[course] = coursesJson[course].course_slug;
-    return courseSlugsArray;
-  } catch (error) {
-    return null;
+exports.getAllCourses = async (url, adminAuthToken) => {
+  let urlWithToken;
+  let allCourses = [];
+  let page = 1;
+  let responseJsonCoursesPage
+  while (true) {
+    try {
+      urlWithToken = url + '/api/admin/courses?page=' + page + '&auth_token=' + adminAuthToken;
+      responseJsonCoursesPage = await axios.get(urlWithToken);
+    } catch (error) {
+      return [];
+    }
+    if (responseJsonCoursesPage.data[0] == undefined)
+      break;
+    allCourses.push(responseJsonCoursesPage.data);
+    page++;
   }
+  return allCourses;
 }
 
 exports.getNumberOfUsers = async (url, adminAuthToken) => {
-  let usersJson = await this.getJsonWithAllUsers(url, adminAuthToken);
-  return usersJson.length;
+  let usersJson = await this.getAllUsers(url, adminAuthToken);
+  let length = 0;
+  for (let page of usersJson) {
+    length += page.length;
+  }
+  return length;
 }
 
-exports.getJsonWithAllUsers = async (url, adminAuthToken) => {
-  let urlWithToken = url + '/api/admin/users?page=1&created_at=2019-02-25T11:23:54.275-03:00&active=true&auth_token=' + adminAuthToken;
-  try {
-    let response = await axios.get(urlWithToken);
-    if (response.status != 200)
-      return null;
-
-    let pageNumber = 1;
-    while (response.data != []) {
-      pageNumber++;
-      urlWithToken = url + '/api/admin/users?page='+ pageNumber + '&active=true&auth_token=' + adminAuthToken;
-      try {
-        response = await axios.get(urlWithToken);
-        if (response.status != 200)
-          return null;
-        allUsers.push(JSON.parse(response.data));
-      } catch (error) {
-        return null;
-      }
+exports.getAllUsers = async (url, adminAuthToken) => {
+  let urlWithToken;
+  let allUsers = [];
+  let page = 1;
+  let responseJsonUsersPage
+  while (true) {
+    try {
+      urlWithToken = url + '/api/admin/users?page=' + page + '&active=true&auth_token=' + adminAuthToken;
+      responseJsonUsersPage = await axios.get(urlWithToken);
+    } catch (error) {
+      return [];
     }
-    return response.data;
-  } catch (error) {
-    return null;
+    if (responseJsonUsersPage.data[0] == undefined)
+      break;
+    allUsers.push(responseJsonUsersPage.data);
+    page++;
   }
+  return allUsers;
+}
+
+exports.getNumberOfTracks = async (url, adminAuthToken) => {
+  let tracksJson = await this.getAllTracks(url, adminAuthToken);
+  let length = 0;
+  for (let page of tracksJson) {
+    length += page.length;
+  }
+  return length;
+}
+
+exports.getAllTracks = async (url, adminAuthToken) => {
+  let urlWithToken;
+  let allTracks = [];
+  let page = 1;
+  let responseJsonTracksPage
+  while (true) {
+    try {
+      urlWithToken = url + '/api/admin/tracks?page=' + page + '&active=true&auth_token=' + adminAuthToken;
+      responseJsonTracksPage = await axios.get(urlWithToken);
+    } catch (error) {
+      return [];
+    }
+    if (responseJsonTracksPage.data[0] == undefined)
+      break;
+    allTracks.push(responseJsonTracksPage.data);
+    page++;
+  }
+  return allTracks;
 }
