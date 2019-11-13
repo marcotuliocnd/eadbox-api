@@ -50,7 +50,7 @@ exports.blockUser = async (url, adminAuthToken, userName) => {
 }
 
 exports.getUserIdFromName = async (url, adminAuthToken, userName) => {
-  const allUsers = await this.getAllUsers(url, adminAuthToken);
+  const allUsers = await this.getAllUsersActive(url, adminAuthToken);
   for (userArray of allUsers) {
     for (user of userArray) {
       if (user.name == userName)
@@ -60,7 +60,7 @@ exports.getUserIdFromName = async (url, adminAuthToken, userName) => {
 }
 
 exports.getNumberOfUsers = async (url, adminAuthToken) => {
-  let usersJson = await this.getAllUsers(url, adminAuthToken);
+  let usersJson = await this.getAllUsersActive(url, adminAuthToken);
   let length = 0;
   for (let page of usersJson) {
     length += page.length;
@@ -68,7 +68,7 @@ exports.getNumberOfUsers = async (url, adminAuthToken) => {
   return length;
 }
 
-exports.getAllUsers = async (url, adminAuthToken) => {
+exports.getAllUsersActive = async (url, adminAuthToken) => {
   let urlWithToken;
   let allUsers = [];
   let page = 1;
@@ -76,6 +76,58 @@ exports.getAllUsers = async (url, adminAuthToken) => {
   while (true) {
     try {
       urlWithToken = url + '/api/admin/users?page=' + page + '&active=true&auth_token=' + adminAuthToken;
+      responseJsonUsersPage = await axios.get(urlWithToken);
+    } catch (error) {
+      return [];
+    }
+    if (responseJsonUsersPage.data[0] == undefined)
+      break;
+    allUsers.push(responseJsonUsersPage.data);
+    page++;
+  }
+  return allUsers;
+}
+
+exports.unBlockUser = async (url, adminAuthToken, userName) => {
+  const userId = await this.getUserIdLockedFromName(url, adminAuthToken, userName);
+  const urlWithToken = url + '/api/admin/users/' + userId + '/unlock?auth_token=' + adminAuthToken;
+  try {
+    const unBlockResponse = await axios.post(urlWithToken);
+    return unBlockResponse.data.valid;
+  } catch (error) {
+    console.warn(error);
+    console.error('Não foi possível alcançar o host destino');
+    return false;
+  }
+}
+
+exports.getUserIdLockedFromName = async (url, adminAuthToken, userName) => {
+  const allUsers = await this.getAllUsersLocked(url, adminAuthToken);
+  for (userArray of allUsers) {
+    for (user of userArray) {
+      if (user.name == userName)
+        return user.user_id;
+    }
+  }
+}
+
+exports.getNumberOfUsersLocked = async (url, adminAuthToken) => {
+  let usersJson = await this.getAllUsersLocked(url, adminAuthToken);
+  let length = 0;
+  for (let page of usersJson) {
+    length += page.length;
+  }
+  return length;
+}
+
+exports.getAllUsersLocked = async (url, adminAuthToken) => {
+  let urlWithToken;
+  let allUsers = [];
+  let page = 1;
+  let responseJsonUsersPage
+  while (true) {
+    try {
+      urlWithToken = url + '/api/admin/users?page=' + page + '&locked=true&auth_token=' + adminAuthToken;
       responseJsonUsersPage = await axios.get(urlWithToken);
     } catch (error) {
       return [];
