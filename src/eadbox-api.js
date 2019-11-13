@@ -8,6 +8,16 @@ exports.makeLoginFromEmailAndPassword = async (url, userEmailPassword) => {
   }
 }
 
+exports.getUserIdFromName = async (url, adminAuthToken, userName) => {
+  const allUsers = await this.getAllUsers(url, adminAuthToken);
+  for (userArray of allUsers) {
+    for (user of userArray) {
+      if (user.name == userName)
+        return user.user_id;
+    }
+  }
+}
+
 exports.getUserAuthTokenFromLogin = async (url, userEmailPassword) => {
   try {
     return (await this.makeLoginFromEmailAndPassword(url, userEmailPassword)).authentication_token;
