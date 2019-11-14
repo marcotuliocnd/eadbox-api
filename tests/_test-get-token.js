@@ -5,9 +5,8 @@ async function start() {
   const url = 'https://unispk.com.br'
   const adminAuthToken = await eadbox.getUserAuthTokenFromLogin(url, models.adminEmailAndPassword);
 
-  const unblock = await eadbox.unBlockUser(url, adminAuthToken, 'Marco Tulio Candeo - SPK');
-
-  console.log(unblock);
+  const userToken = await eadbox.addCourseForUser(url, adminAuthToken, 'Marco Tulio Candeo - SPK' , 'Fiscal');
+  console.log(userToken);
 }
 
 start();

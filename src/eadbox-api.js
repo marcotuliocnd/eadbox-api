@@ -16,6 +16,33 @@ exports.getUserAuthTokenFromLogin = async (url, userEmailPassword) => {
   }
 }
 
+exports.addCourseForUser = async (url, adminAuthToken, userName,courseName) => {
+  const user_id = await this.getUserIdFromName(url, adminAuthToken, userName);
+  const urlWithToken = url + '/api/admin/subscriptions?auth_token=' + adminAuthToken;
+  const course_id = await this.getCourseIdFromName(url, adminAuthToken, courseName);
+  try {
+    const addResponse = await axios.post(urlWithToken, {
+      user_id,
+      course_id
+    });
+    return addResponse.data.valid;
+  } catch (error) {
+    console.warn(error);
+    console.error('Não foi possível alcançar o host destino');
+    return false;
+  }
+}
+
+exports.getCourseIdFromName = async (url, adminAuthToken, courseName) => {
+  const allCourses = await this.getAllCourses(url, adminAuthToken);
+  for (courseArray of allCourses) {
+    for (course of courseArray) {
+      if (course.title == courseName)
+        return course.course_id;
+    }
+  }
+}
+
 exports.createNewUser = async (url, userObject) => {
   try {
     return (await axios.post(url + '/api/signup', userObject)).data;
