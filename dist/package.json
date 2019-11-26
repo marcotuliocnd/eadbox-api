@@ -1,6 +1,6 @@
 {
   "name": "eadbox-api",
-  "version": "1.1.0",
+  "version": "2.0.1",
   "description": "Uma biblioteca que ajuda na manipulação da api do eadbox",
   "main": "eadbox-api.js",
   "repository": "https://github.com/marcotuliocnd/eadbox-api",

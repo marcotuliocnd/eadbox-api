@@ -1,4 +1,4 @@
-const Eadbox = require('../src/eadbox-api');
+const Eadbox = require('../dist/eadbox-api');
 
 async function start() {
   const adminAuthToken = 'TTZzhduB6szRJGHcPtBi';
