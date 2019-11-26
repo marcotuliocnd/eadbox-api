@@ -1,256 +1,257 @@
 const axios = require('axios');
 
-exports.makeLoginFromEmailAndPassword = async (url, userEmailPassword) => {
-  try {
-    return (await axios.post(url + '/api/login', userEmailPassword)).data;
-  } catch (error) {
-    return err;
-  }
-}
-
-exports.getUserAuthTokenFromLogin = async (url, userEmailPassword) => {
-  try {
-    return (await this.makeLoginFromEmailAndPassword(url, userEmailPassword)).authentication_token;
-  } catch (err) {
-    return err;
-  }
-}
-
-exports.addCourseForUser = async (url, adminAuthToken, userName,courseName) => {
-  const user_id = await this.getUserIdFromName(url, adminAuthToken, userName);
-  const urlWithToken = url + '/api/admin/subscriptions?auth_token=' + adminAuthToken;
-  const course_id = await this.getCourseIdFromName(url, adminAuthToken, courseName);
-  try {
-    const addResponse = await axios.post(urlWithToken, {
-      user_id,
-      course_id
+class Eadbox {
+  constructor(url) {
+    this.api = axios.create({
+      baseURL: url
     });
-    return addResponse.data.valid;
-  } catch (error) {
-    console.warn(error);
-    console.error('Não foi possível alcançar o host destino');
-    return false;
   }
-}
 
-exports.getCourseIdFromName = async (url, adminAuthToken, courseName) => {
-  const allCourses = await this.getAllCourses(url, adminAuthToken);
-  for (courseArray of allCourses) {
-    for (course of courseArray) {
-      if (course.title == courseName)
-        return course.course_id;
-    }
-  }
-}
-
-exports.createNewUser = async (url, userObject) => {
-  try {
-    return (await axios.post(url + '/api/signup', userObject)).data;
-  } catch (err) {
-    return err;
-  }
-}
-
-exports.updateUserInformation = async (url, adminAuthToken, userId, userObject) => {
-  urlWithToken = url + '/api/admin/users/' + userId + '?auth_token=' + adminAuthToken;
-  try {
-    const updateResponse = await axios.patch(urlWithToken, userObject);
-    return updateResponse.data.valid;
-  } catch (error) {
-    console.warn(error);
-    console.error('Não foi possível enviar a requisição de updateUserInformation');
-    return false;
-  }
-}
-
-exports.blockUser = async (url, adminAuthToken, userName) => {
-  const userId = await this.getUserIdFromName(url, adminAuthToken, userName);
-  const urlWithToken = url + '/api/admin/users/' + userId + '?auth_token=' + adminAuthToken;
-  try {
-    const blockResponse = await axios.delete(urlWithToken);
-    return blockResponse.data.valid;
-  } catch (error) {
-    console.warn(error);
-    console.error('Não foi possível alcançar o host destino');
-    return false;
-  }
-}
-
-exports.getUserIdFromName = async (url, adminAuthToken, userName) => {
-  const allUsers = await this.getAllUsersActive(url, adminAuthToken);
-  for (userArray of allUsers) {
-    for (user of userArray) {
-      if (user.name == userName)
-        return user.user_id;
-    }
-  }
-}
-
-exports.getNumberOfUsers = async (url, adminAuthToken) => {
-  let usersJson = await this.getAllUsersActive(url, adminAuthToken);
-  let length = 0;
-  for (let page of usersJson) {
-    length += page.length;
-  }
-  return length;
-}
-
-exports.getAllUsersActive = async (url, adminAuthToken) => {
-  let urlWithToken;
-  let allUsers = [];
-  let page = 1;
-  let responseJsonUsersPage
-  while (true) {
+  async makeLoginFromEmailAndPassword(userEmailPassword) {
     try {
-      urlWithToken = url + '/api/admin/users?page=' + page + '&active=true&auth_token=' + adminAuthToken;
-      responseJsonUsersPage = await axios.get(urlWithToken);
+      return (await this.api.post('/api/login', userEmailPassword)).data;
     } catch (error) {
-      return [];
-    }
-    if (responseJsonUsersPage.data[0] == undefined)
-      break;
-    allUsers.push(responseJsonUsersPage.data);
-    page++;
-  }
-  return allUsers;
-}
-
-exports.unBlockUser = async (url, adminAuthToken, userName) => {
-  const userId = await this.getUserIdLockedFromName(url, adminAuthToken, userName);
-  const urlWithToken = url + '/api/admin/users/' + userId + '/unlock?auth_token=' + adminAuthToken;
-  try {
-    const unBlockResponse = await axios.post(urlWithToken);
-    return unBlockResponse.data.valid;
-  } catch (error) {
-    console.warn(error);
-    console.error('Não foi possível alcançar o host destino');
-    return false;
-  }
-}
-
-exports.getUserIdLockedFromName = async (url, adminAuthToken, userName) => {
-  const allUsers = await this.getAllUsersLocked(url, adminAuthToken);
-  for (userArray of allUsers) {
-    for (user of userArray) {
-      if (user.name == userName)
-        return user.user_id;
+      return err;
     }
   }
-}
 
-exports.getNumberOfUsersLocked = async (url, adminAuthToken) => {
-  let usersJson = await this.getAllUsersLocked(url, adminAuthToken);
-  let length = 0;
-  for (let page of usersJson) {
-    length += page.length;
-  }
-  return length;
-}
-
-exports.getAllUsersLocked = async (url, adminAuthToken) => {
-  let urlWithToken;
-  let allUsers = [];
-  let page = 1;
-  let responseJsonUsersPage
-  while (true) {
+  async getUserAuthTokenFromLogin(userEmailPassword) {
     try {
-      urlWithToken = url + '/api/admin/users?page=' + page + '&locked=true&auth_token=' + adminAuthToken;
-      responseJsonUsersPage = await axios.get(urlWithToken);
-    } catch (error) {
-      return [];
+      return (await this.makeLoginFromEmailAndPassword(userEmailPassword)).authentication_token;
+    } catch (err) {
+      return err;
     }
-    if (responseJsonUsersPage.data[0] == undefined)
-      break;
-    allUsers.push(responseJsonUsersPage.data);
-    page++;
   }
-  return allUsers;
-}
 
-exports.getNumberOfCourses = async (url, adminAuthToken) => {
-  let coursesJson = await this.getAllCourses(url, adminAuthToken);
-  let length = 0;
-  for (let page of coursesJson) {
-    length += page.length;
-  }
-  return length;
-}
-
-exports.getAllCourses = async (url, adminAuthToken) => {
-  let urlWithToken;
-  let allCourses = [];
-  let page = 1;
-  let responseJsonCoursesPage
-  while (true) {
+  async addCourseForUser(adminAuthToken, userName, courseName) {
+    const user_id = await this.getUserIdFromName(adminAuthToken, userName);
+    const urlWithToken = '/api/admin/subscriptions?auth_token=' + adminAuthToken;
+    const course_id = await this.getCourseIdFromName(adminAuthToken, courseName);
     try {
-      urlWithToken = url + '/api/admin/courses?page=' + page + '&auth_token=' + adminAuthToken;
-      responseJsonCoursesPage = await axios.get(urlWithToken);
+      const addResponse = await this.api.post(urlWithToken, {
+        user_id,
+        course_id
+      });
+      return addResponse.data.valid;
     } catch (error) {
-      return [];
+      console.warn(error);
+      console.error('Não foi possível alcançar o host destino');
+      return false;
     }
-    if (responseJsonCoursesPage.data[0] == undefined)
-      break;
-    allCourses.push(responseJsonCoursesPage.data);
-    page++;
   }
-  return allCourses;
-}
 
-exports.getNumberOfTracks = async (url, adminAuthToken) => {
-  let tracksJson = await this.getAllTracks(url, adminAuthToken);
-  let length = 0;
-  for (let page of tracksJson) {
-    length += page.length;
+  async getCourseIdFromName(adminAuthToken, courseName) {
+    const allCourses = await this.getAllCourses(adminAuthToken);
+    for (let courseArray of allCourses) {
+      for (let course of courseArray) {
+        if (course.title == courseName)
+          return course.course_id;
+      }
+    }
   }
-  return length;
-}
 
-exports.getAllTracks = async (url, adminAuthToken) => {
-  let urlWithToken;
-  let allTracks = [];
-  let page = 1;
-  let responseJsonTracksPage
-  while (true) {
+  async getAllCourses(adminAuthToken) {
+    let urlWithToken;
+    let allCourses = [];
+    let page = 1;
+    let responseJsonCoursesPage
+    while (true) {
+      try {
+        urlWithToken = '/api/admin/courses?page=' + page + '&auth_token=' + adminAuthToken;
+        responseJsonCoursesPage = await this.api.get(urlWithToken);
+      } catch (error) {
+        return [];
+      }
+      if (responseJsonCoursesPage.data[0] == undefined)
+        break;
+      allCourses.push(responseJsonCoursesPage.data);
+      page++;
+    }
+    return allCourses;
+  }
+
+  async getUserIdFromName(adminAuthToken, userName) {
+    const allUsers = await this.getAllUsersActive(adminAuthToken);
+    for (let userArray of allUsers) {
+      for (let user of userArray) {
+        if (user.name == userName)
+          return user.user_id;
+      }
+    }
+  }
+
+  async getNumberOfUsers(adminAuthToken) {
+    let usersJson = await this.getAllUsersActive(adminAuthToken);
+    let length = 0;
+    for (let page of usersJson) {
+      length += page.length;
+    }
+    return length;
+  }
+
+  async getAllUsersActive(adminAuthToken) {
+    let urlWithToken;
+    let allUsers = [];
+    let page = 1;
+    let responseJsonUsersPage
+    while (true) {
+      try {
+        urlWithToken = '/api/admin/users?page=' + page + '&active=true&auth_token=' + adminAuthToken;
+        responseJsonUsersPage = await this.api.get(urlWithToken);
+      } catch (error) {
+        return [];
+      }
+      if (responseJsonUsersPage.data[0] == undefined)
+        break;
+      allUsers.push(responseJsonUsersPage.data);
+      page++;
+    }
+    return allUsers;
+  }
+
+  async createNewUser(userObject) {
     try {
-      urlWithToken = url + '/api/admin/tracks?page=' + page + '&active=true&auth_token=' + adminAuthToken;
-      responseJsonTracksPage = await axios.get(urlWithToken);
-    } catch (error) {
-      return [];
+      return (await this.api.post('/api/signup', userObject)).data;
+    } catch (err) {
+      return err;
     }
-    if (responseJsonTracksPage.data[0] == undefined)
-      break;
-    allTracks.push(responseJsonTracksPage.data);
-    page++;
   }
-  return allTracks;
+
+  async updateUserInformation(adminAuthToken, userId, userObject) {
+    const urlWithToken = '/api/admin/users/' + userId + '?auth_token=' + adminAuthToken;
+    try {
+      const updateResponse = await this.api.patch(urlWithToken, userObject);
+      return updateResponse.data.valid;
+    } catch (error) {
+      console.warn(error);
+      console.error('Não foi possível enviar a requisição de updateUserInformation');
+      return false;
+    }
+  }
+
+  async blockUser(adminAuthToken, userName) {
+    const userId = await this.getUserIdFromName(adminAuthToken, userName);
+    const urlWithToken = '/api/admin/users/' + userId + '?auth_token=' + adminAuthToken;
+    try {
+      const blockResponse = await this.api.delete(urlWithToken);
+      return blockResponse.data.valid;
+    } catch (error) {
+      console.warn(error);
+      console.error('Não foi possível alcançar o host destino');
+      return false;
+    }
+  }
+
+  async unBlockUser(adminAuthToken, userName) {
+    const userId = await this.getUserIdLockedFromName(adminAuthToken, userName);
+    const urlWithToken = '/api/admin/users/' + userId + '/unlock?auth_token=' + adminAuthToken;
+    try {
+      const unBlockResponse = await this.api.post(urlWithToken);
+      return unBlockResponse.data.valid;
+    } catch (error) {
+      console.warn(error);
+      console.error('Não foi possível alcançar o host destino');
+      return false;
+    }
+  }
+
+  async getUserIdLockedFromName(adminAuthToken, userName) {
+    const allUsers = await this.getAllUsersLocked(adminAuthToken);
+    for (let userArray of allUsers) {
+      for (let user of userArray) {
+        if (user.name == userName)
+          return user.user_id;
+      }
+    }
+  }
+
+  async getNumberOfUsersLocked(adminAuthToken) {
+    let usersJson = await this.getAllUsersLocked(adminAuthToken);
+    let length = 0;
+    for (let page of usersJson) {
+      length += page.length;
+    }
+    return length;
+  }
+
+  async getAllUsersLocked(adminAuthToken) {
+    let urlWithToken;
+    let allUsers = [];
+    let page = 1;
+    let responseJsonUsersPage
+    while (true) {
+      try {
+        urlWithToken = '/api/admin/users?page=' + page + '&locked=true&auth_token=' + adminAuthToken;
+        responseJsonUsersPage = await this.api.get(urlWithToken);
+      } catch (error) {
+        return [];
+      }
+      if (responseJsonUsersPage.data[0] == undefined)
+        break;
+      allUsers.push(responseJsonUsersPage.data);
+      page++;
+    }
+    return allUsers;
+  }
+
+  async getNumberOfTracks(adminAuthToken) {
+    let tracksJson = await this.getAllTracks(adminAuthToken);
+    let length = 0;
+    for (let page of tracksJson) {
+      length += page.length;
+    }
+    return length;
+  }
+
+  async getAllTracks(adminAuthToken) {
+    let urlWithToken;
+    let allTracks = [];
+    let page = 1;
+    let responseJsonTracksPage
+    while (true) {
+      try {
+        urlWithToken = '/api/admin/tracks?page=' + page + '&active=true&auth_token=' + adminAuthToken;
+        responseJsonTracksPage = await this.api.get(urlWithToken);
+      } catch (error) {
+        return [];
+      }
+      if (responseJsonTracksPage.data[0] == undefined)
+        break;
+      allTracks.push(responseJsonTracksPage.data);
+      page++;
+    }
+    return allTracks;
+  }
+
+  async getScoreRanking() {
+    try {
+      const rankingScore = await this.api.get('/api/rankings/score');
+      return rankingScore.data;
+    } catch (error) {
+      console.error('Não foi possível geral o ranking por score');
+      console.error(error);
+    }
+  }
+
+  async getBadgeRanking() {
+    try {
+      const rankingBadge = await this.api.get('/api/rankings/badges');
+      return rankingBadge.data;
+    } catch (error) {
+      console.error('Não foi possível geral o ranking por badges');
+      console.error(error);
+    }
+  }
+
+  async getCollectorRanking() {
+    try {
+      const rankingCollector = await this.api.get('/api/rankings/collectors');
+      return rankingCollector.data;
+    } catch (error) {
+      console.error('Não foi possível geral o ranking por collectors');
+      console.error(error);
+    }
+  }
 }
 
-exports.getScoreRanking = async (url) => {
-  try {
-    const rankingScore = await axios.get(url + '/api/rankings/score');
-    return rankingScore.data;
-  } catch (error) {
-    console.error('Não foi possível geral o ranking por score');
-    console.error(error);
-  }
-}
-
-exports.getBadgeRanking = async (url) => {
-  try {
-    const rankingBadge = await axios.get(url + '/api/rankings/badges');
-    return rankingBadge.data;
-  } catch (error) {
-    console.error('Não foi possível geral o ranking por badges');
-    console.error(error);
-  }
-}
-
-exports.getCollectorRanking = async (url) => {
-  try {
-    const rankingCollector = await axios.get(url + '/api/rankings/collectors');
-    return rankingCollector.data;
-  } catch (error) {
-    console.error('Não foi possível geral o ranking por collectors');
-    console.error(error);
-  }
-}
+module.exports = Eadbox;
